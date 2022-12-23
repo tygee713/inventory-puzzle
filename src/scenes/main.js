@@ -23,12 +23,19 @@ const sections = {
 const scene = Scene({
   id: 'main',
   level: 1,
+  hoveredSectionNum: null,
   hoveredSection: null,
   selectedSection: null,
   selectedItemId: null,
   movingItemId: null,
   itemMenuOpen: false,
   objects: [Cursor, Drops, Inventory, Discard, ProficiencyMeter, GoldMeter, WeightMeter],
+  onShow: function() {
+    this.hoveredSectionNum = 0
+    this.hoveredSection = sections[this.hoveredSectionNum]
+    Cursor.sectionNum = this.hoveredSectionNum
+    Cursor.section = sections[this.hoveredSectionNum]
+  },
   createBossItems: function() {
     // create x items of y rarity, depending on level
     let bossItems = []
@@ -86,18 +93,37 @@ const scene = Scene({
 // TODO: support A button on gamepad
 onKey('z', () => {
   // if an item menu is open, select the hovered option
-
+  if (scene.itemMenuOpen) {
+    if (Item[selectedItemId].itemMenu.hover == 0) {
+      scene.startMoveItem(selectedItemId)
+    } else {
+      scene.trashItem(selectedItemId)
+    }
   // otherwise, if a section is selected, select the hovered item
-
+  } else if (scene.selectedSection) {
+    scene.selectedItemId = Cursor.cell.item.id
+    scene.openItemMenu()
   // otherwise, select the hovered section
+  } else {
+    scene.selectedSection = scene.hoveredSection
+  }
 })
 // TODO: support B button on gamepad
 onKey('x', () => {
-  // if an item is being moved, put it back in its origin
-
-  // otherwise, if an item menu is open, close the item menu
-
-  // otherwise, unselect a hovered section
+  // if an item menu is open, close the item menu
+  if (scene.itemMenuOpen) {
+    scene.closeItemMenu()
+    // otherwise, if an item is being moved, put it back in its origin
+  } else if (scene.movingItemId) {
+    Item[movingItemId].isMoving = false
+    scene.movingItemId = null
+    // otherwise, unselect the current section and have the cursor hover the section
+  } else {
+    Cursor.cell = null
+    scene.selectedSection = null
+    scene.hoveredSection = Cursor.section
+    scene.hoveredSectionNum = Cursor.sectionNum
+  }
 })
 
 // TODO: support gamepad directionals
@@ -108,24 +134,17 @@ onKey('up', () => {
     Item[selectedItemId].itemMenu.up()
     // otherwise, if there is a selected section, change the position of the cursor relative to that section
   } else if (scene.selectedSection) {
-    let section = sections[scene.selectedSection]
-    let newCell = section.upFrom(Cursor.position)
-    Cursor.position = newCell.position
-    Cursor.x = newCell.x
-    Cursor.y = newCell.y
+    let cell = scene.selectedSection.upFrom(Cursor.cell)
+    Cursor.cell = cell
     // otherwise, cycle through the sections
   } else {
-    if (scene.hoveredSection = 0) {
-      scene.hoveredSection = 2
+    if (scene.hoveredSectionNum = 0) {
+      scene.hoveredSectionNum = 2
     } else {
-      scene.hoveredSection -= 1
+      scene.hoveredSectionNum -= 1
     }
-    Cursor.position = scene.hoveredSection
-    let section = sections[scene.hoveredSection]
-    Cursor.x = section.x
-    Cursor.y = section.y
-    Cursor.width = section.width
-    Cursor.height = section.height
+    let section = sections[scene.hoveredSectionNum]
+    Cursor.section = section
   }
 })
 onKey('down', () => {
@@ -134,24 +153,17 @@ onKey('down', () => {
     Item[selectedItemId].itemMenu.down()
     // otherwise, if there is a selected section, change the position of the cursor relative to that section
   } else if (scene.selectedSection) {
-    let section = sections[scene.selectedSection]
-    let newCell = section.downFrom(Cursor.position)
-    Cursor.position = newCell.position
-    Cursor.x = newCell.x
-    Cursor.y = newCell.y
+    let cell = scene.selectedSection.downFrom(Cursor.cell)
+    Cursor.cell = cell
     // otherwise, cycle through the sections
   } else {
-    if (scene.hoveredSection = 0) {
-      scene.hoveredSection = 2
+    if (scene.hoveredSectionNum = 0) {
+      scene.hoveredSectionNum = 2
     } else {
-      scene.hoveredSection -= 1
+      scene.hoveredSectionNum -= 1
     }
-    Cursor.position = scene.hoveredSection
-    let section = sections[scene.hoveredSection]
-    Cursor.x = section.x
-    Cursor.y = section.y
-    Cursor.width = section.width
-    Cursor.height = section.height
+    let section = sections[scene.hoveredSectionNum]
+    Cursor.section = section
   }
 })
 onKey('left', () => {
@@ -160,24 +172,17 @@ onKey('left', () => {
     Item[selectedItemId].itemMenu.left()
     // otherwise, if there is a selected section, change the position of the cursor relative to that section
   } else if (scene.selectedSection) {
-    let section = sections[scene.selectedSection]
-    let newCell = section.leftFrom(Cursor.position)
-    Cursor.position = newCell.position
-    Cursor.x = newCell.x
-    Cursor.y = newCell.y
+    let cell = scene.selectedSection.leftFrom(Cursor.cell)
+    Cursor.cell = cell
     // otherwise, cycle through the sections
   } else {
-    if (scene.hoveredSection = 0) {
-      scene.hoveredSection = 2
+    if (scene.hoveredSectionNum = 0) {
+      scene.hoveredSectionNum = 2
     } else {
-      scene.hoveredSection -= 1
+      scene.hoveredSectionNum -= 1
     }
-    Cursor.position = scene.hoveredSection
-    let section = sections[scene.hoveredSection]
-    Cursor.x = section.x
-    Cursor.y = section.y
-    Cursor.width = section.width
-    Cursor.height = section.height
+    let section = sections[scene.hoveredSectionNum]
+    Cursor.section = section
   }
 })
 onKey('right', () => {
@@ -186,24 +191,17 @@ onKey('right', () => {
     Item[selectedItemId].itemMenu.right()
     // otherwise, if there is a selected section, change the position of the cursor relative to that section
   } else if (scene.selectedSection) {
-    let section = sections[scene.selectedSection]
-    let newCell = section.rightFrom(Cursor.position)
-    Cursor.position = newCell.position
-    Cursor.x = newCell.x
-    Cursor.y = newCell.y
+    let cell = scene.selectedSection.rightFrom(Cursor.cell)
+    Cursor.cell = cell
     // otherwise, cycle through the sections
   } else {
-    if (scene.hoveredSection = 0) {
-      scene.hoveredSection = 2
+    if (scene.hoveredSectionNum = 0) {
+      scene.hoveredSectionNum = 2
     } else {
-      scene.hoveredSection -= 1
+      scene.hoveredSectionNum -= 1
     }
-    Cursor.position = scene.hoveredSection
-    let section = sections[scene.hoveredSection]
-    Cursor.x = section.x
-    Cursor.y = section.y
-    Cursor.width = section.width
-    Cursor.height = section.height
+    let section = sections[scene.hoveredSectionNum]
+    Cursor.section = section
   }
 })
 
