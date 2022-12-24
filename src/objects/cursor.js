@@ -5,7 +5,6 @@ const { canvas } = init()
 
 export default Sprite({
   anchor: { x: 0, y: 0 },
-  // color: 'pink',
   render: function() {
     this.context.lineWidth = 2
     this.context.strokeStyle = 'pink'

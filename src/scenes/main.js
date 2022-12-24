@@ -1,8 +1,8 @@
 import { init, initKeys, onKey, Scene } from '../../lib/kontra.min.mjs'
 import Grid from '../objects/grid.js'
-// import Item from '../objects/item.js'
+import Item from '../objects/item.js'
 import Cursor from '../objects/cursor.js'
-// import { Bar } from '../objects/bar.js'
+// import Bar from '../objects/bar.js'
 
 const { canvas } = init()
 initKeys()
@@ -13,10 +13,10 @@ const bossDropsY = 50
 
 const inventoryRows = 2
 const inventoryCols = 3
-const inventoryX = 200
+const inventoryX = 150
 const inventoryY = 50
 
-const discardX = 350
+const discardX = 400
 const discardY = 50
 
 const Drops = Grid(0, numBossDrops, 1, bossDropsX, bossDropsY)
@@ -43,17 +43,40 @@ const scene = Scene({
   movingItemId: null,
   itemMenuOpen: false,
   objects: [Drops, Inventory, Discard, Cursor],
+  render: function() {
+    Drops.render()
+    Inventory.render()
+    Discard.render()
+    Cursor.render()
+    if (this.currentHover) {
+      this.currentHover.render()
+    }
+  },
   onShow: function() {
     this.hoveredSectionNum = 0
     Cursor.section = sections[this.hoveredSectionNum]
+    this.createBossItems()
   },
   createBossItems: function() {
     // create x items of y rarity, depending on level
     let bossItems = []
     // pull from a list of items that can appear in a level
+    for (let i=0; i<numBossDrops; i++) {
+      bossItems.push(Item(i, {
+        name: 'Example Item',
+        gold: 1,
+        proficiency: 1,
+        weight: 1,
+        flavorText: 'This is an example item.',
+        imageSrc: 'assets/example_item.png'
+      }))
+    }
     // get a variety of different item types, rarities
     // set those items as children of the Drops object
-    Drops.items.push(bossItems)
+    Drops.cells.forEach((cell, i) => {
+      cell.item = bossItems[i]
+      bossItems[i].cell = cell
+    })
   },
   createStartingInventory: function() {
     // create x items of y rarity, depending on level
@@ -118,6 +141,7 @@ onKey('z', () => {
   } else {
     scene.selectedSection = Cursor.section
     Cursor.cell = scene.selectedSection.cells[0]
+    Cursor.cell.hoverCell()
   }
 })
 
@@ -132,6 +156,7 @@ onKey('x', () => {
     scene.movingItemId = null
     // otherwise, unselect the current section and have the cursor hover the section
   } else {
+    Cursor.cell.unhoverCell()
     Cursor.cell = null
     scene.selectedSection = null
   }

@@ -5,8 +5,8 @@ import Cursor from './cursor.js'
 
 const { canvas } = init()
 
-const cellWidth = 36
-const cellHeight = 36
+const cellWidth = 70
+const cellHeight = 70
 
 const createGrid = (id, rows, cols, x, y) => {
   let cellX = cellWidth / 2
@@ -17,17 +17,17 @@ const createGrid = (id, rows, cols, x, y) => {
     cellX = cellWidth / 2
     for (let x=0; x<cols; x++) {
       cells.push(Cell(x+i*cols, cellX, cellY))
-      cellX += cellWidth
+      cellX += cellWidth - 2
     }
-    cellY += cellHeight
+    cellY += cellHeight - 2
   }
   
   return Sprite({
     x,
     y,
     id,
-    width: cellWidth * cols,
-    height: cellHeight * rows,
+    width: cellWidth * cols - ((cols - 1) * 2),
+    height: cellHeight * rows - ((rows - 1) * 2),
     color: 'black',
     cells,
     rows,
@@ -38,7 +38,9 @@ const createGrid = (id, rows, cols, x, y) => {
       if (newCellId < 0) {
         // play error sound
       } else {
+        Cursor.cell && Cursor.cell.unhoverCell()
         Cursor.cell = this.cells[newCellId]
+        Cursor.cell.hoverCell()
       }
     },
     downFrom: function() {
@@ -46,7 +48,9 @@ const createGrid = (id, rows, cols, x, y) => {
       if (newCellId > cells.length - 1) {
         // play error sound
       } else {
+        Cursor.cell && Cursor.cell.unhoverCell()
         Cursor.cell = this.cells[newCellId]
+        Cursor.cell.hoverCell()
       }
     },
     leftFrom: function() {
@@ -54,7 +58,9 @@ const createGrid = (id, rows, cols, x, y) => {
       if (newCellId < 0) {
         // play error sound
       } else {
+        Cursor.cell && Cursor.cell.unhoverCell()
         Cursor.cell = this.cells[newCellId]
+        Cursor.cell.hoverCell()
       }
     },
     rightFrom: function() {
@@ -62,7 +68,9 @@ const createGrid = (id, rows, cols, x, y) => {
       if (newCellId > cells.length - 1) {
         // play error sound
       } else {
+        Cursor.cell && Cursor.cell.unhoverCell()
         Cursor.cell = this.cells[newCellId]
+        Cursor.cell.hoverCell()
       }
     },
   })
