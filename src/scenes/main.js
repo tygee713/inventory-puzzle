@@ -1,4 +1,4 @@
-import { init, initKeys, onKey, Scene } from '../../lib/kontra.min.mjs'
+import { init, initGamepad, initKeys, gamepadPressed, onKey, Scene, onGamepad } from '../../lib/kontra.min.mjs'
 import Grid from '../objects/grid.js'
 import Item from '../objects/item.js'
 import Cursor from '../objects/cursor.js'
@@ -6,6 +6,7 @@ import Cursor from '../objects/cursor.js'
 
 const { canvas } = init()
 initKeys()
+initGamepad()
 
 const numBossDrops = 5
 const bossDropsX = 50
@@ -124,9 +125,7 @@ const scene = Scene({
   }
 })
 
-// TODO: support A button on gamepad
-onKey('z', () => {
-  // if an item menu is open, select the hovered option
+const actionPress = () => {
   if (scene.itemMenuOpen) {
     if (scene.items[selectedItemId].itemMenu.hover == 0) {
       scene.startMoveItem(selectedItemId)
@@ -143,10 +142,9 @@ onKey('z', () => {
     Cursor.cell = scene.selectedSection.cells[0]
     Cursor.cell.hoverCell()
   }
-})
+}
 
-// TODO: support B button on gamepad
-onKey('x', () => {
+const backPress = () => {
   // if an item menu is open, close the item menu
   if (scene.itemMenuOpen) {
     scene.closeItemMenu()
@@ -160,10 +158,9 @@ onKey('x', () => {
     Cursor.cell = null
     scene.selectedSection = null
   }
-})
+}
 
-// TODO: support gamepad directionals
-onKey('arrowup', () => {
+const moveUp = () => {
   // if an item menu is open, change the selected option
   if (scene.itemMenuOpen) {
     scene.items[selectedItemId].itemMenu.up()
@@ -180,8 +177,9 @@ onKey('arrowup', () => {
     let section = sections[scene.hoveredSectionNum]
     Cursor.section = section
   }
-})
-onKey('arrowdown', () => {
+}
+
+const moveDown = () => {
   // if an item menu is open, change the selected option
   if (scene.itemMenuOpen) {
     scene.items[selectedItemId].itemMenu.down()
@@ -198,8 +196,9 @@ onKey('arrowdown', () => {
     let section = sections[scene.hoveredSectionNum]
     Cursor.section = section
   }
-})
-onKey('arrowleft', () => {
+}
+
+const moveLeft = () => {
   // if an item menu is open, change the selected option
   if (scene.itemMenuOpen) {
     scene.items[selectedItemId].itemMenu.left()
@@ -216,8 +215,9 @@ onKey('arrowleft', () => {
     let section = sections[scene.hoveredSectionNum]
     Cursor.section = section
   }
-})
-onKey('arrowright', () => {
+}
+
+const moveRight = () => {
   // if an item menu is open, change the selected option
   if (scene.itemMenuOpen) {
     scene.items[selectedItemId].itemMenu.right()
@@ -234,6 +234,54 @@ onKey('arrowright', () => {
     let section = sections[scene.hoveredSectionNum]
     Cursor.section = section
   }
+}
+
+onKey('z', () => {
+  actionPress()
 })
+
+onGamepad('south', () => {
+  actionPress()
+}, { gamepad: 0 })
+
+onKey('x', () => {
+  backPress()
+})
+
+onGamepad('east', () => {
+  backPress()
+}, { gamepad: 0 })
+
+onKey('arrowup', () => {
+  moveUp()
+})
+
+onGamepad('dpadup', () => {
+  moveUp()
+}, { gamepad: 0 })
+
+onKey('arrowdown', () => {
+  moveDown()
+})
+
+onGamepad('dpaddown', () => {
+  moveDown()
+}, { gamepad: 0 })
+
+onKey('arrowleft', () => {
+  moveLeft()
+})
+
+onGamepad('dpadleft', () => {
+  moveLeft()
+}, { gamepad: 0 })
+
+onKey('arrowright', () => {
+  moveRight()
+})
+
+onGamepad('dpadright', () => {
+  moveRight()
+}, { gamepad: 0 })
 
 export default scene
