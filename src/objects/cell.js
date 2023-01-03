@@ -33,8 +33,23 @@ const createCell = (id, x, y) => {
     },
     unhoverCell: function() {
       if (this.item) {
-        this.item.toolTip.cell = null
         MainScene.currentHover = null
+      }
+    },
+    selectCell: function() {
+      if (this.item) {
+        this.item.menu.x = this.world.x + tileWidth / 4
+        this.item.menu.y = this.world.y - tileWidth / 2 + 50
+        MainScene.currentMenu = this.item.menu
+        MainScene.selectedItem = this.item
+        MainScene.itemMenuOpen = true
+      }
+    },
+    deselectCell: function() {
+      if (this.item) {
+        MainScene.currentMenu = null
+        MainScene.selectedItem = null
+        MainScene.itemMenuOpen = false
       }
     }
   })

@@ -40,8 +40,8 @@ const scene = Scene({
   hoveredSectionNum: null,
   hoveredSection: null,
   selectedSection: null,
-  selectedItemId: null,
-  movingItemId: null,
+  selectedItem: null,
+  movingItem: null,
   itemMenuOpen: false,
   objects: [Drops, Inventory, Discard, Cursor],
   render: function() {
@@ -51,6 +51,9 @@ const scene = Scene({
     Cursor.render()
     if (this.currentHover) {
       this.currentHover.render()
+    }
+    if (this.currentMenu) {
+      this.currentMenu.render()
     }
   },
   onShow: function() {
@@ -89,36 +92,31 @@ const scene = Scene({
   },
   placeItem: function(cellId) {
     // if current space is occupied, replace item with currently moving item
-    if (this.cells[cellId].itemId) {
-      trashItem(this.cells[cellId].itemId)
+    if (this.cells[cellId].item) {
+      trashItem(this.cells[cellId].item)
     }
-    this.cells[cellId].itemId = this.movingItemId
-    this.movingItemId = null
-  },
-  selectItem: function(itemId) {
-    this.selectedItemId = itemId
-    this.openItemMenu()
+    this.cells[cellId].item = this.movingItem
+    this.movingItem = null
   },
   openItemMenu: function() {
     // open item menu with options to trash item or move item
-    this.items[selectedItemId].menuOpen = true
-    this.itemMenuOpen = true
+    Cursor.cell.selectCell()
+    
   },
   closeItemMenu: function() {
-    this.items[selectedItemId].menuOpen = false
-    this.itemMenuOpen = false
+    Cursor.cell.deselectCell()
   },
-  trashItem: function(itemId) {
+  trashItem: function(item) {
     // close the menu
     this.closeItemMenu()
     // unselect the item
-    this.selectedItemId = null
+    this.selectedItem = null
     // move item from its current location to the discard area
-    Discard.items.push(itemId)
+    Discard.items.push(item)
   },
-  startMoveItem: function(itemId) {
+  startMoveItem: function(item) {
     // change the moving item
-    this.movingItemId = itemId
+    this.movingItem = item
   },
   updateMeters: function() {
     // after each time the items in inventory are changed, calculate new meter values
@@ -127,14 +125,13 @@ const scene = Scene({
 
 const actionPress = () => {
   if (scene.itemMenuOpen) {
-    if (scene.items[selectedItemId].itemMenu.hover == 0) {
-      scene.startMoveItem(selectedItemId)
+    if (scene.selectedItem.menu.hover == 0) {
+      scene.startMoveItem(scene.selectedItem)
     } else {
-      scene.trashItem(selectedItemId)
+      scene.trashItem(scene.selectedItem)
     }
   // otherwise, if a section is selected, select the hovered item
   } else if (scene.selectedSection) {
-    scene.selectedItemId = Cursor.cell.item.id
     scene.openItemMenu()
   // otherwise, select the hovered section
   } else {
@@ -149,9 +146,9 @@ const backPress = () => {
   if (scene.itemMenuOpen) {
     scene.closeItemMenu()
     // otherwise, if an item is being moved, put it back in its origin
-  } else if (scene.movingItemId) {
-    scene.items[movingItemId].isMoving = false
-    scene.movingItemId = null
+  } else if (scene.movingItem) {
+    scene.movingItem.isMoving = false
+    scene.movingItem = null
     // otherwise, unselect the current section and have the cursor hover the section
   } else {
     Cursor.cell.unhoverCell()
@@ -163,7 +160,7 @@ const backPress = () => {
 const moveUp = () => {
   // if an item menu is open, change the selected option
   if (scene.itemMenuOpen) {
-    scene.items[selectedItemId].itemMenu.up()
+    scene.selectedItem.menu.up()
     // otherwise, if there is a selected section, change the position of the cursor relative to that section
   } else if (scene.selectedSection) {
     scene.selectedSection.upFrom()
@@ -182,7 +179,7 @@ const moveUp = () => {
 const moveDown = () => {
   // if an item menu is open, change the selected option
   if (scene.itemMenuOpen) {
-    scene.items[selectedItemId].itemMenu.down()
+    scene.selectedItem.menu.down()
     // otherwise, if there is a selected section, change the position of the cursor relative to that section
   } else if (scene.selectedSection) {
     scene.selectedSection.downFrom()
@@ -201,7 +198,7 @@ const moveDown = () => {
 const moveLeft = () => {
   // if an item menu is open, change the selected option
   if (scene.itemMenuOpen) {
-    scene.items[selectedItemId].itemMenu.left()
+    scene.selectedItem.menu.up()
     // otherwise, if there is a selected section, change the position of the cursor relative to that section
   } else if (scene.selectedSection) {
     scene.selectedSection.leftFrom()
@@ -220,7 +217,7 @@ const moveLeft = () => {
 const moveRight = () => {
   // if an item menu is open, change the selected option
   if (scene.itemMenuOpen) {
-    scene.items[selectedItemId].itemMenu.right()
+    scene.selectedItem.menu.down()
     // otherwise, if there is a selected section, change the position of the cursor relative to that section
   } else if (scene.selectedSection) {
     scene.selectedSection.rightFrom()
