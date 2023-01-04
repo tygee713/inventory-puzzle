@@ -47,6 +47,7 @@ const createCell = (id, x, y) => {
     },
     deselectCell: function() {
       if (this.item) {
+        MainScene.selectedItem.menu.hover = 0
         MainScene.currentMenu = null
         MainScene.selectedItem = null
         MainScene.itemMenuOpen = false

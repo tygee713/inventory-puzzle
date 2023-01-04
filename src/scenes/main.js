@@ -90,12 +90,12 @@ const scene = Scene({
     // set those items as children of the Inventory object
     Inventory.items.push(startingItems)
   },
-  placeItem: function(cellId) {
+  placeItem: function() {
     // if current space is occupied, replace item with currently moving item
-    if (this.cells[cellId].item) {
-      trashItem(this.cells[cellId].item)
+    if (Cursor.cell.item) {
+      trashItem(Cursor.cell.item)
     }
-    this.cells[cellId].item = this.movingItem
+    Cursor.cell.item = this.movingItem
     this.movingItem = null
   },
   openItemMenu: function() {
@@ -130,6 +130,9 @@ const actionPress = () => {
     } else {
       scene.trashItem(scene.selectedItem)
     }
+  // otherwise, if there's a currently moving item, place the item in the hovered cell
+  } else if (scene.movingItem) {
+    scene.placeItem()
   // otherwise, if a section is selected, select the hovered item
   } else if (scene.selectedSection) {
     scene.openItemMenu()
@@ -147,7 +150,7 @@ const backPress = () => {
     scene.closeItemMenu()
     // otherwise, if an item is being moved, put it back in its origin
   } else if (scene.movingItem) {
-    scene.movingItem.isMoving = false
+    // scene.movingItem.isMoving = false
     scene.movingItem = null
     // otherwise, unselect the current section and have the cursor hover the section
   } else {

@@ -41,14 +41,14 @@ const createToolTip = (info) => {
 
 const createMenu = (width) => {
   const Confirm = Text({
-    x: 10,
+    x: 20,
     y: 10,
     font: '12px Arial',
     color: 'white',
     text: 'Select'
   })
   const Remove = Text({
-    x: 10,
+    x: 20,
     y: 30,
     font: '12px Arial',
     color: 'white',
@@ -56,12 +56,12 @@ const createMenu = (width) => {
   })
   const SelectArrow = Text({
     x: 5,
-    y: Confirm.y + Confirm.height / 2,
+    y: Confirm.y,
     font: '12px Arial',
     color: 'white',
     text: '->',
     update: function(dt) {
-      this.y = this.parent.hover === 0 ? Confirm.y + Confirm.height / 2 : Remove.y + Remove.height / 2
+      this.y = this.parent.hover === 0 ? Confirm.y : Remove.y
     }
   })
 
